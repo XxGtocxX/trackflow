@@ -1,6 +1,7 @@
 package com.debanuj.trackflow.service;
 
 import com.debanuj.trackflow.dto.CreateUserRequest;
+import com.debanuj.trackflow.dto.UserResponse;
 import com.debanuj.trackflow.entity.User;
 import com.debanuj.trackflow.enums.Role;
 import com.debanuj.trackflow.repository.UserRepository;
@@ -21,21 +22,28 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User createUser(CreateUserRequest request) {
+    public UserResponse createUser(CreateUserRequest request) {
 
         User user = new User();
 
         user.setName(request.getName());
         user.setEmail(request.getEmail());
 
-        // Hash password before saving
         user.setPasswordHash(
                 passwordEncoder.encode(request.getPassword())
         );
 
-        // Default role assigned by server
         user.setRole(Role.DEVELOPER);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        UserResponse response = new UserResponse();
+
+        response.setId(savedUser.getId());
+        response.setName(savedUser.getName());
+        response.setEmail(savedUser.getEmail());
+        response.setRole(savedUser.getRole().name());
+
+        return response;
     }
 }
