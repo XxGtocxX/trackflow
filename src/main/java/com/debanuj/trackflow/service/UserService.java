@@ -1,5 +1,6 @@
 package com.debanuj.trackflow.service;
 
+import com.debanuj.trackflow.exception.EmailAlreadyExistsException;
 import com.debanuj.trackflow.dto.CreateUserRequest;
 import com.debanuj.trackflow.dto.UserResponse;
 import com.debanuj.trackflow.entity.User;
@@ -23,7 +24,11 @@ public class UserService {
     }
 
     public UserResponse createUser(CreateUserRequest request) {
-
+        if(userRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException(
+                    "Email already exists"
+            );
+        }
         User user = new User();
 
         user.setName(request.getName());
