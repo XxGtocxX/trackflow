@@ -1,5 +1,6 @@
 package com.debanuj.trackflow.service;
 
+import com.debanuj.trackflow.security.JwtService;
 import com.debanuj.trackflow.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.Optional;
 
 @Service
 public class AuthService {
+    private final JwtService jwtService;
     public LoginResponse login(
             LoginRequest request
     ) {
@@ -41,18 +43,24 @@ public class AuthService {
             );
         }
 
-        return new LoginResponse(
-                "LOGIN_SUCCESS"
+        String token = jwtService.generateToken(
+                user.getId(),
+                user.getEmail(),
+                user.getRole().name()
         );
+
+        return new LoginResponse(token);
     }
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     public AuthService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 }
